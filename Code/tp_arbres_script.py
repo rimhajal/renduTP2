@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import rc
+import graphviz
+
 
 from sklearn import tree, datasets
 from tp_arbres_source import (rand_gauss, rand_bi_gauss, rand_tri_gauss,
@@ -147,10 +149,14 @@ for i in range(dmax):
 plt.draw()
 
 
+
 plt.figure()
-plt.plot(dmax,scores_gini)  
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
 plt.xlabel('Max depth')
 plt.ylabel('Accuracy Score')
+plt.legend()
+plt.title("Comparing Entropy and Gini Criterion Accuracy Scores in terms of Max Depth")
 plt.draw()
 print("Scores with entropy criterion: ", scores_entropy)
 print("Scores with Gini criterion: ", scores_gini)
@@ -159,7 +165,7 @@ print("Scores with Gini criterion: ", scores_gini)
 # Q3 Afficher la classification obtenue en utilisant la profondeur qui minimise le pourcentage d’erreurs
 # obtenues avec l’entropie
 
-# dt_entropy.max_depth = ... TODO
+dt_entropy.max_depth = 12
 
 plt.figure()
 frontiere(lambda x: dt_entropy.predict(x.reshape((1, -1))), X, Y, step=100)
@@ -171,7 +177,10 @@ print("Best scores with entropy criterion: ", dt_entropy.score(X, Y))
 # Q4.  Exporter la représentation graphique de l'arbre: Need graphviz installed
 # Voir https://scikit-learn.org/stable/modules/tree.html#classification
 
-# TODO
+tree.plot_tree(dt_entropy)
+dot_data = tree.export_graphviz(dt_entropy, out_file=None)
+graph = graphviz.Source(dot_data)
+graph.render("arbre", format='pdf')
 
 #%%
 # Q5 :  Génération d'une base de test
