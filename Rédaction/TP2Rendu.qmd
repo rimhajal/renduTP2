@@ -1,0 +1,19 @@
+---
+title: "TP2 : Les Arbres"
+author: "Rim ALHAJAL"
+format: pdf
+editor: visual
+jupyter: python3
+---
+
+# Introduction
+
+## Question 1.
+
+
+```{python}
+#| echo: false
+2 * 2
+```
+
+
