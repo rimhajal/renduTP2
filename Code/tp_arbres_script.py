@@ -188,7 +188,7 @@ data_test = rand_checkers(40, 40, 40, 40)
 X_test = data_test[:, :2]
 Y_test = data_test[:, 2].astype(int)
 
-dmax = 12
+dmax = 20
 scores_entropy = np.zeros(dmax)
 scores_gini = np.zeros(dmax)
 plt.figure(figsize=(6, 7))
@@ -208,9 +208,9 @@ plt.figure()
 plt.plot(1-scores_entropy, label='entropy')
 plt.plot(1-scores_gini, label='gini')
 plt.legend()
-plt.xlabel('Max depth')
+plt.xlabel('Max Depth')
 plt.ylabel('Accuracy Score')
-plt.title('Testing error')
+plt.title('Testing Error')
 print(scores_entropy)
 
 #%%
@@ -257,21 +257,20 @@ plt.draw()
 
 
 plt.figure()
-plt.plot(scores_entropy, label='entropy')
-plt.plot(scores_gini, label='gini')
-plt.xlabel('Max depth')
-plt.ylabel('Accuracy Score')
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
+plt.xlabel('Max Depth')
+plt.ylabel('Training Error')
 plt.legend(["entropy", "gini"])
 plt.draw()
-print("Scores with entropy criterion: ", scores_entropy)
-print("Scores with Gini criterion: ", scores_gini)
+print("Errors with entropy criterion: ", 1-scores_entropy)
+print("Errors with Gini criterion: ", 1-scores_gini)
 
 #%%
-dmax = 20
+dmax = 15
 scores_entropy = np.zeros(dmax)
 scores_gini = np.zeros(dmax)
 
-plt.figure(figsize=(6, 7))
 for i in range(dmax):
     dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
                                              max_depth=i + 1)
@@ -282,15 +281,14 @@ for i in range(dmax):
     dt_gini.fit(X_train, Y_train)
     scores_gini[i] = dt_gini.score(X_test, Y_test)
 
-plt.draw()
-plt.figure()
-plt.plot(scores_entropy, label='entropy')
-plt.plot(scores_gini, label='gini')
+plt.figure(figsize=(15,10))
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
 plt.legend(["entropy", "gini"])
 plt.xlabel('Max depth')
-plt.ylabel('Accuracy Score')
-plt.title("Testing error")
-print(scores_entropy)
+plt.ylabel('Testing Error')
+plt.draw()
+print("Error with entropy criterion: ", 1-scores_entropy)
 
 #%%
 
