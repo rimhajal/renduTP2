@@ -294,11 +294,11 @@ print("Error with entropy criterion: ", 1-scores_entropy)
 
 # Q7. estimer la meilleur profondeur avec un cross_val_score
 
-np.random.seed(56)
+np.random.seed(256)
 
 error_ent = []
 error_gini = []
-dmax = 16
+dmax = 20
 X = digits.data
 y = digits.target
 for i in range(dmax):
@@ -314,8 +314,8 @@ for i in range(dmax):
 plt.figure(figsize=(7, 4))
 plt.plot(error_ent, label="entropy")
 plt.plot(error_gini, label="gini")
-plt.xlabel('Depth')
-plt.ylabel("Error")
+plt.xlabel('Max Depth')
+plt.ylabel("Testing Error")
 plt.legend()
 plt.title("Error with entropy and gini criterion")
 plt.show()

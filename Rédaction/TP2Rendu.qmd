@@ -237,6 +237,9 @@ print(scores_entropy)
 
 Avec les données test, on trouve une différence avec l'entropie et l'indice de gini. En effet, l'entropie aboutit à de meilleurs résultats et des erreurs plus petites que celles obtenues avec l'indice de gini. De plus, la chute des erreurs est plus rapide avec l'entropie qu'avec l'indice de gini. D'après le graphe, on peut dire que 6 est un bon choix de profondeur.
 
+#Méthodes de Choix de Paramètres - Sélection de modèle
+<a name="Méthodes de Choix de Paramètres - Sélection de modèle"></a>
+
 ## Validation Croisée
 <a name="Validation Croisée"></a>
 
@@ -288,4 +291,37 @@ Il est possible d'obtenir des résultats différents avec la méthode de validat
 Une courbe d'apprentissage est une représentation graphique montrant l'évolution du score d'un modèle d'apprentissage automatique avec l'augmentation de données d'entraînement. 
 
 ```{python}
+X = digits.data
+y = digits.target
+model = tree.DecisionTreeClassifier(criterion='entropy', max_depth=best_depth)
+
+n_samples, train_scores, test_scores = learning_curve(model, X, y, cv=5)
+
+train_scores_mean = np.mean(train_scores, axis=1)
+train_scores_std = np.std(train_scores, axis=1)
+test_scores_mean = np.mean(test_scores, axis=1)
+test_scores_std = np.std(test_scores, axis=1)
+
+plt.figure()
+plt.title("Learning Curve")
+plt.xlabel("Training Set Size")
+plt.ylabel("Score")
+plt.grid()
+plt.fill_between(n_samples, train_scores_mean - train_scores_std,
+                 train_scores_mean + train_scores_std, alpha=0.1,
+                 color="blue")
+plt.fill_between(n_samples, test_scores_mean - test_scores_std,
+                 test_scores_mean + test_scores_std, alpha=0.1,
+                 color="red")
+plt.plot(n_samples, train_scores_mean, 'o-', color="blue",
+         label="Training Score")
+plt.plot(n_samples, test_scores_mean, 'o-', color="red",
+         label="Cross Validation Score")
+plt.legend()
+plt.show()
+```
+
+La courbe en bleue correspond aux scores des données d'entrainement. Le score est constant pour une valeur de 1, c'est-à-dire le modèle a bien appris sur les données.
+La courbe en rouge correspond aux scores de validation croisée augmente avec la taille du training set, même arrivant à un score de 0.8. Ceci signifie que le modèle ne se trouve ni dans une situation de sur-ajustement ni de sous-ajustement. 
+
 
