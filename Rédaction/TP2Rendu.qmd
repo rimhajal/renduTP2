@@ -7,17 +7,21 @@ jupyter: python3
 ---
 
 # Arbres de Décision - Algorithme CART
+<a name="Arbre de Décision - Algorithme CART"></a>
 
 ## Introduction
+<a name="Introduction"></a>
 
 Publié par Leo Breiman en 1984, l'algorithme CART (Classification and Regression Trees) servira comme une méthode pour construire des arbres de décision pouvant être utilisés à la fois pour la classification et la régression. Depuis, CART est devenu un algorithme fondamental dans le domaine de l'apprentissage automatique et de l'analyse de données.
 
 ## Mesure d'Homogénéité
+<a name="Mesure d'Homogénéité"></a>
 
 Dans le cadre de la régression, on peut mesurer l'homogénéité à partir du calcul de la variance.
 Effectivement, si les données sont plus "variées" entre eux, elles deviennent plus hétérogènes. Ainsi, l'homogénéité est donné par la variance minimale.
 
 ## Simulations
+<a name="Simulations"></a>
 
 En utilisant la fonction `rand_checkers`, on construit un échantillon de taille $n=456$ bien équilibré. 
 
@@ -71,6 +75,7 @@ On remarque que l'erreur diminue pour les deux courbes semblablement et presque 
 L'idée est de trouver une profondeur maximale idéale servira à éviter le sur-apprentissage et le sous-apprentissage.
 
 ## Classification pour une Erreur Minimale (Entropie)
+<a name="Classification pour une Erreur Minimale (Entropie)"></a>
 
 Avec la fonction `frontiere`, on obtient la classification obtenue avec l'entropie pour une profondeur maximale choisie arbitrairement. Ici, on prend `max_depth = 10`.
 
@@ -85,7 +90,152 @@ plt.draw()
 print("Best score with entropy criterion: ", dt_entropy.score(X_train, Y_train))
 ```
 
-## Graphviz
+## Arbres de Décision
+<a name="Arbres de Décisions"></a>
+
+Avec le package `graphviz`, on est capable de visualiser l'arbre de décision des données. On obtient le résultat suivant :
+
+<img src='Schémas/Arbre_Q4.png' width=800>
+
+Un arbre de décision s'agit d'un nœud principal appelé "racine" donnant deux nœuds enfants. Chaque nœud non-terminal engendre à son tour deux autres nœuds, et ainsi de suite. À mesure que l'arbre progresse, nous atteignons finalement les nœuds terminaux, où les décisions sont prises.
+
+Si la condition au niveau du nœud $k$ est satisfaite, nous empruntons la branche de gauche ; autrement, nous suivons la branche de droite.
+
+## Nouveau Echantillon
+<a name="Nouveau Echantillon"></a>
+
+Reprenons la même démarche qu'avant mais avec de nouvelles données. 
+
+```{python}
+#| echo: false
+data_test = rand_checkers(40, 40, 40, 40)
+X_test = data_test[:, :2]
+Y_test = data_test[:, 2].astype(int)
+
+dmax = 20
+scores_entropy = np.zeros(dmax)
+scores_gini = np.zeros(dmax)
+plt.figure(figsize=(6, 7))
+
+for i in range(dmax):
+    dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
+                                             max_depth=i + 1)
+    dt_entropy.fit(X_train, Y_train)
+    scores_entropy[i] = dt_entropy.score(X_test, Y_test)
+
+    dt_gini = tree.DecisionTreeClassifier(criterion='gini', max_depth=i+1)
+    dt_gini.fit(X_train, Y_train)
+    scores_gini[i] = dt_gini.score(X_test, Y_test)
+
+plt.draw()
+plt.figure()
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
+plt.legend()
+plt.xlabel('Max Depth')
+plt.ylabel('Accuracy Score')
+plt.title('Testing Error')
+print(scores_entropy)
+```
+
+Comme dans la première partie, les erreurs des deux critères se comportent de la même manière. 
+On note qu'avec une taille de n = 160 < 456, l'erreur s'annule plus rapidement. Dès une profondeur maximale de 9, il est clair qu'il sera inutile d'augmenter la profondeur vue que l'erreur est pratiquement stable à ce point là.
+
+## Dataset `DIGITS`
+<a name="Dataset `DIGITS`"></a>
+
+On effectue encore une fois la même étude mais cette fois-ci sur les données `DIGITS` disponibles sur Python dans le module `sklearn.datasets`.
+On découpe tout d'abord les données en "testing set" et "training set" et ceci à travers la fonction `train_test_split`.
+
+```{python}
+#| echo: false
+digits = datasets.load_digits()
+
+X, y = digits.data, digits.target
+
+ntest = len(digits.data)-int(len(digits.data)*0.8)
+X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2)
+
+X_train = digits.data[:ntest]
+Y_train = digits.target[:ntest]
+X_test = digits.data[ntest:]
+Y_test = digits.target[ntest:]
+
+dt_entropy = tree.DecisionTreeClassifier(criterion='entropy')
+dt_gini = tree.DecisionTreeClassifier(criterion='gini')
+
+dt_entropy.fit(X_train, Y_train)
+dt_gini.fit(X_train, Y_train)
+
+print(dt_entropy)
+print(dt_entropy.get_params())
+```
+
+Maintenant, on s'intéresse à l'erreur :
+
+```{python}
+#| echo: false
+dmax = 15
+scores_entropy = np.zeros(dmax)
+scores_gini = np.zeros(dmax)
+
+plt.figure(figsize=(15, 10))
+for i in range(dmax):
+    dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
+                                             max_depth=i+1)
+    dt_entropy.fit(X_train, Y_train)
+    scores_entropy[i] = dt_entropy.score(X_train, Y_train)
+
+    dt_gini = tree.DecisionTreeClassifier(criterion='gini', max_depth=i+1)
+    dt_gini.fit(X_train, Y_train)
+    scores_gini[i] = dt_gini.score(X_train, Y_train)
+plt.draw()
 
 
+plt.figure()
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
+plt.xlabel('Max Depth')
+plt.ylabel('Training Error')
+plt.legend(["entropy", "gini"])
+plt.draw()
+print("Error with entropy criterion: ", 1-scores_entropy)
+print("Error with Gini criterion: ", 1-scores_gini)
+```
+
+On remarque ici que pour les données d'entrainement, le graphe renseigne une erreur nulle au bout d'une profondeur maximale égale à 8. Ceci est cohérent avec le travail d'avant.
+Ce qui est plus important, c'est l'erreur avec les données test :
+
+
+```{python}
+#| echo: false
+dmax = 15
+scores_entropy = np.zeros(dmax)
+scores_gini = np.zeros(dmax)
+
+plt.figure(figsize=(6, 7))
+for i in range(dmax):
+    dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',
+                                             max_depth=i + 1)
+    dt_entropy.fit(X_train, Y_train)
+    scores_entropy[i] = dt_entropy.score(X_test, Y_test)
+
+    dt_gini = tree.DecisionTreeClassifier(criterion='gini', max_depth=i+1)
+    dt_gini.fit(X_train, Y_train)
+    scores_gini[i] = dt_gini.score(X_test, Y_test)
+
+plt.draw()
+plt.figure()
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
+plt.legend(["entropy", "gini"])
+plt.xlabel('Max Depth')
+plt.ylabel('Accuracy Score')
+print(scores_entropy)
+```
+
+Avec les données test, on trouve une différence avec l'entropie et l'indice de gini. En effet, l'entropie aboutit à de meilleurs résultats et des erreurs plus petites que celles obtenues avec l'indice de gini. De plus, la chute des erreurs est plus rapide avec l'entropie qu'avec l'indice de gini.
+D'après le graphe, on peut dire que 6 est un bon choix de profondeur.
+
+## Validation Croisée
 
