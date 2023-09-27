@@ -26,6 +26,28 @@ Dans le cadre de la régression, on peut mesurer l'homogénéité à partir du c
 
 <a name="Simulations"></a>
 
+Importons les packages nécessaires en premier :
+
+```{python}
+#| echo: FALSE
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib import rc
+import graphviz
+
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.model_selection import learning_curve
+
+sys.path.append('./Code/')
+
+from sklearn import tree, datasets
+from tp_arbres_source import (rand_gauss, rand_bi_gauss, rand_tri_gauss,
+                              rand_checkers, rand_clown,
+                              plot_2d, frontiere)
+```
+
 En utilisant la fonction `rand_checkers`, on construit un échantillon de taille $n=456$ bien équilibré.
 
 ```{python}
@@ -73,7 +95,7 @@ print("Scores with entropy criterion: ", scores_entropy)
 print("Scores with Gini criterion: ", scores_gini)
 ```
 
-On remarque que l'erreur diminue pour les deux courbes semblablement et presque s'annule à partir d'une profondeur maximale égale à 10. L'idée est de trouver une profondeur maximale idéale servira à éviter le sur-apprentissage et le sous-apprentissage.
+On remarque que l'erreur diminue pour les deux courbes semblablement et presque s'annule à partir d'une profondeur maximale égale à 10. L'idée est de trouver une profondeur maximale idéale qui servira à éviter le sur-apprentissage et le sous-apprentissage.
 
 ## Classification pour une Erreur Minimale (Entropie)
 
@@ -137,9 +159,8 @@ plt.plot(1-scores_entropy, label='entropy')
 plt.plot(1-scores_gini, label='gini')
 plt.legend()
 plt.xlabel('Max Depth')
-plt.ylabel('Accuracy Score')
-plt.title('Testing Error')
-print(scores_entropy)
+plt.ylabel('Testing Error')
+print(1-scores_entropy)
 ```
 
 Comme dans la première partie, les erreurs des deux critères se comportent de la même manière. On note qu'avec une taille de n = 160 \< 456, l'erreur s'annule plus rapidement. Dès une profondeur maximale de 9, il est clair qu'il sera inutile d'augmenter la profondeur vue que l'erreur est pratiquement stable à ce point là.
@@ -323,5 +344,3 @@ plt.show()
 
 La courbe en bleue correspond aux scores des données d'entrainement. Le score est constant pour une valeur de 1, c'est-à-dire le modèle a bien appris sur les données.
 La courbe en rouge correspond aux scores de validation croisée augmente avec la taille du training set, même arrivant à un score de 0.8. Ceci signifie que le modèle ne se trouve ni dans une situation de sur-ajustement ni de sous-ajustement. 
-
-
