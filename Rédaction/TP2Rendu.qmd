@@ -6,14 +6,86 @@ editor: visual
 jupyter: python3
 ---
 
-# Introduction
+# Arbres de Décision - Algorithme CART
 
-## Question 1.
+## Introduction
 
+Publié par Leo Breiman en 1984, l'algorithme CART (Classification and Regression Trees) servira comme une méthode pour construire des arbres de décision pouvant être utilisés à la fois pour la classification et la régression. Depuis, CART est devenu un algorithme fondamental dans le domaine de l'apprentissage automatique et de l'analyse de données.
+
+## Mesure d'Homogénéité
+
+Dans le cadre de la régression, on peut mesurer l'homogénéité à partir du calcul de la variance.
+Effectivement, si les données sont plus "variées" entre eux, elles deviennent plus hétérogènes. Ainsi, l'homogénéité est donné par la variance minimale.
+
+## Simulations
+
+En utilisant la fonction `rand_checkers`, on construit un échantillon de taille $n=456$ bien équilibré. 
 
 ```{python}
 #| echo: false
-2 * 2
+data = rand_checkers(n1=114,n2=114,n3=114,n4=114,sigma=0.1)
+n_samples = len(data)
+X_train = data[:, :2]
+Y_train = data[:, 2].astype(int)
 ```
+
+Ensuite, on calcul le pourcentage d'erreurs comises en fonction de la profondeur maximale des arbres de décisions selon les critères "indice de Gini" et "entropie". 
+Pour exécuter cette étape, il faut importer le module `tree` de `sklearn`.
+
+```{python}
+#| echo: false
+dt_entropy = tree.DecisionTreeClassifier(criterion='entropy')
+dt_gini = tree.DecisionTreeClassifier(criterion='gini')
+
+dmax = 12
+scores_entropy = np.zeros(dmax)
+scores_gini = np.zeros(dmax)
+
+plt.figure(figsize=(15, 10))
+for i in range(dmax):
+    dt_entropy = tree.DecisionTreeClassifier(criterion='entropy',max_depth=i+1)
+    dt_entropy.fit(X_train,Y_train)
+    scores_entropy[i] = dt_entropy.score(X_train, Y_train)
+
+    dt_gini = tree.DecisionTreeClassifier(criterion='gini',max_depth=i+1)
+    dt_gini.fit(X_train,Y_train)
+    scores_gini[i] = dt_gini.score(X_train, Y_train)
+
+    plt.subplot(3, 4, i + 1)
+    frontiere(lambda x: dt_gini.predict(x.reshape((1, -1))), X_train, Y_train, step=50, samples=False)
+plt.draw()
+
+plt.figure()
+plt.plot(1-scores_entropy, label='entropy')
+plt.plot(1-scores_gini, label='gini')
+plt.xlabel('Max depth')
+plt.ylabel('Accuracy Score')
+plt.legend()
+plt.title("Comparing Entropy and Gini Criterion Accuracy Scores in terms of Max Depth")
+plt.draw()
+print("Scores with entropy criterion: ", scores_entropy)
+print("Scores with Gini criterion: ", scores_gini)
+```
+
+On remarque que l'erreur diminue pour les deux courbes semblablement et presque s'annule à partir d'une profondeur maximale égale à 10.
+L'idée est de trouver une profondeur maximale idéale servira à éviter le sur-apprentissage et le sous-apprentissage.
+
+## Classification pour une Erreur Minimale (Entropie)
+
+Avec la fonction `frontiere`, on obtient la classification obtenue avec l'entropie pour une profondeur maximale choisie arbitrairement. Ici, on prend `max_depth = 10`.
+
+```{python}
+#| echo: false
+dt_entropy.max_depth = 10
+
+plt.figure()
+frontiere(lambda x: dt_entropy.predict(x.reshape((1, -1))), X_train, Y_train, step=100)
+plt.title("Frontier with Minimum Error from Entropy Criterion")
+plt.draw()
+print("Best score with entropy criterion: ", dt_entropy.score(X_train, Y_train))
+```
+
+## Graphviz
+
 
 
