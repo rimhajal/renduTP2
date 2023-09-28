@@ -1,9 +1,17 @@
 ---
 title: "TP2 : Les Arbres"
-author: "Rim ALHAJAL"
-format: pdf
-editor: visual
-jupyter: python3
+title-block-banner: true
+format: 
+  html:   
+    code-fold: true
+    code-tools: true
+    theme: minty
+toc: true
+toc-depth: 3
+toc-title: "Sommaire"
+author:
+  - name: Rim Alhajal
+date: 2023-09-27
 ---
 
 # Arbres de Décision - Algorithme CART
