@@ -6,7 +6,7 @@ Ce TP reporte sur les arbres de décision et l'algorithme CART.
 
 * `tp_arbre_source.py`: code source de certaines fonctions
 * `tp_arbre_script.py` : code python qui répond aux questions du TP
-* `tp2rendu.qmd` : rédaction du TP 
+* `tp2rendu.html` : rédaction du TP 
 * `requirements.txt` : liste des packages demandés
 * `graphes` : fichier qui regroupe sous forme de .png tous les graphes obtenues 
 
